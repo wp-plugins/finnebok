@@ -1,4 +1,4 @@
-=== Ebok-søk ===
+=== Ebook Search by Webloft ===
 Contributors: sundaune
 Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft
 Requires at least: 4.0
