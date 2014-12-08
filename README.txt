@@ -1,6 +1,6 @@
 === Ebok-søk ===
 Contributors: sundaune
-Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search
+Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft
 Requires at least: 4.0
 Tested up to: 4.0
 Stable tag: 1.0
