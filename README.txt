@@ -15,7 +15,7 @@ This plugin searches for PDF books and e-books available from Open Library, the 
 
 The plugin uses jQuery to automatically show the search result under the search forms in real time as you type. If you get a great number of hits you can click on the magnifying glass or hit Enter to open the search results in a sortable table in a new window. 
 
-== Beskrivelse == 
+NORWEGIAN:
 
 Dette innstikket søker blant PDF-bøker og e-bøker fra Open Library, Nasjonalbiblioteket og Bokselskap.no. Når innstikket aktiveres installerer det en kortkode (shortcode) som du kan sette inn i sider og innlegg for å vise en søkeboks. I kortkoden kan det angis bredde på søkeboksen i piksler eller prosent, samt hvor mange treff som maksimalt skal hentes fra hver kilde. 
 
@@ -43,7 +43,7 @@ Make sure you have downloaded the .zip file containing the plugin. Then:
 
 = Or install it via the Wordpress repository! =
 
-== Installasjon ==
+NORWEGIAN:
 
 = Laste opp innstikket i kontrollpanelet for Wordpress =
 
@@ -71,7 +71,7 @@ Sørg for at du har lastet ned ZIP-filen som inneholder innstikket. Deretter:
 
 Because the plugin is so new that no question has had the chance to become frequent yet!
 
-== Ofte Stilte Spørsmål ==
+NORWEGIAN:
 
 = Hvorfor er det ingen Ofte Stilte Spørsmål? =
 
@@ -82,7 +82,7 @@ Fordi dette er første versjon - spørsmålene kommer nok etter hvert.
 1. This is the search form
 2. Here is the shortcode as it appears on a page or in a post
 
-== Skjermdumper ==
+NORWEGIAN:
 
 1. Slik ser søkeboksen ut
 2. Slik setter du inn kortkoden i sider eller innlegg
@@ -93,7 +93,7 @@ Fordi dette er første versjon - spørsmålene kommer nok etter hvert.
 
 * First version
 
-== Endringslogg ==
+NORWEGIAN:
 
 = 1.0 =
 
