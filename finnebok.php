@@ -2,14 +2,14 @@
 
 /**
  *
- * @package   Finn ebok
+ * @package   Ebook Search by Webloft
  * @author    Håkon Sundaune <haakon@bibliotekarensbestevenn.no>
  * @license   GPL-3.0+
  * @link      http://www.bibvenn.no 
  * @copyright 2014 Sundaune
  *
  * @wordpress-plugin
- * Plugin Name:       Finn ebok
+ * Plugin Name:       Ebook Search by Webloft
  * Plugin URI:        http://www.bibvenn.no/finnebok
  * Description:       S&oslash;ker i frie e-b&oslash;ker p&aring; tvers av flere baser
  * Version:           1.0.0
