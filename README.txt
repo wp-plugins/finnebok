@@ -43,6 +43,21 @@ Make sure you have downloaded the .zip file containing the plugin. Then:
 
 = Or install it via the Wordpress repository! =
 
+To place the search form in your post/page, simply insert this shortcode:
+
+[finnebok_skjema]
+
+This is the simplest way. There are two optional parameters you can pass along:
+
+	1. width : The width of the form. Given in pecentage (e.g. "40%") or pixels (e.g. "400px"). Default is "250px".
+	2. makstreff : Maximum number of hits to retrieve from each source. Default is 25.
+
+Example of shortcode to insert a search form 300px wide and fetch a maximum of 50 hits from each source:
+
+[finnebok_skjema width="300px" makstreff="50"]
+
+Note that the search form can be styled to your liking by overruling the CSS included with the plugin. 
+
 NORWEGIAN:
 
 = Laste opp innstikket i kontrollpanelet for Wordpress =
