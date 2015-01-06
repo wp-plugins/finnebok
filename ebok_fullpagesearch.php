@@ -206,7 +206,7 @@ foreach ($results as $treff) {
 			$forfatter = $treff->author_name[0];
 			$omslag = "https://covers.openlibrary.org/b/olid/" . $treff->cover_edition_key . "-M.jpg";
 			$kilde = "Open Library";
-			$url = "https://openlibrary.org/works/" . $treff->key;
+			$url = "https://openlibrary.org" . $treff->key;
 			$utgitt = $treff->publish_place[0] . " : " . $treff->publisher[0];
 			$utgittaar = $treff->publish_date[0];
 	
