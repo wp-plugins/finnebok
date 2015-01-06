@@ -12,7 +12,7 @@
  * Plugin Name:       Ebook Search by Webloft
  * Plugin URI:        http://www.bibvenn.no/finnebok
  * Description:       S&oslash;ker etter gratis PDF- og e-b&oslash;ker / search for free PDFs and e-books
- * Version:           1.0.2
+ * Version:           1.0.3
  * Author:            H&aring;kon Sundaune
  * Author URI:        http://www.sundaune.no
  * Text Domain:       finnebok-locale
