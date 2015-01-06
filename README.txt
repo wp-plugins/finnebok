@@ -2,8 +2,8 @@
 Contributors: sundaune
 Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft
 Requires at least: 4.0
-Tested up to: 4.0
-Stable tag: 1.0.2
+Tested up to: 4.1
+Stable tag: 1.0.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -119,11 +119,39 @@ NORWEGIAN:
 
 == Change log ==
 
+= 1.0.3 = 
+
+* Bugfix: header text not respecting specified width
+* Bugfix: Links to Open library titles were wrong (thank you, Håvard Grimelid!)
+* Various cosmetic improvements
+
+= 1.0.2 =
+
+* Improved and more readable readme.txt
+
+= 1.0.1 =
+
+* Fixed various errors
+
 = 1.0 =
 
 * First version
 
 NORWEGIAN:
+
+= 1.0.3 =
+
+* Bugfix: Angitt bredde ble ikke respektert i overskriftstekst
+* Bugfix: Lenker til verker til Openlibrary var feil (takk, Håvard Grimelid!)
+* Forskjellige kosmetiske forbedringer
+
+= 1.0.2 =
+
+* Bedre og mer forståelig readme.txt
+
+= 1.0.1 =
+
+* Fikset forskjellig småtteri
 
 = 1.0 =
 
@@ -131,4 +159,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-No upgrade notice at this point
+This version primarily fixes the bug where Openlibrary links came out wrong.
+
+NORWEGIAN:
+
+Denne versjonen tjener først og fremst til å fikse feilen hvor Openlibrary-lenker var feil programmert inn.
