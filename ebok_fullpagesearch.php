@@ -1,237 +1,3 @@
-<?php
-
-// FINNER E-BØKER OG VISER TREFF PÅ HELE SIDEN
-
-// Declare variables
-$tittel = '';
-$forfatter = '';
-$bokhyllahtml = '';
-$bokhyllatreff = '';
-$bokselskaphtml = '';
-$openlibraryhtml = '';
-$bokhyllaantalltreff = '';
-$bokselskapantalltreff = '';
-$openlibraryantalltreff = '';
-
-// turn on for debug
-
-/*
-ini_set('display_startup_errors',1);
-ini_set('display_errors',1);
-error_reporting(-1);
-*/
-
-// INNSTILLINGER
-$bokhyllaft = 'false'; // fulltekstsøk i Bokhylla? (gir myriader av treff)
-$makstreff = 500; // her slår vi på stortromma - dette er fullpagesearch
-
-// vi trenger funksjoner
-require_once ('includes/functions.php');
-
-// Get Search
-$search_string = urlencode(stripslashes(strip_tags($_REQUEST['query'])));
-$search_string = str_replace ("\"", "%22" , $search_string);
-$search_string = str_replace (" ", "%20" , $search_string);
-
-// Define Output HTML Formatting of single item
-
-$singlehtml = "<tr>\n";
-$singlehtml .= "<td><a href=\"urlString\" target=\"_blank\">titleString</a></td>\n";
-$singlehtml .= "<td>authorString</td>\n";
-$singlehtml .= "<td>publishedString</td>\n";
-$singlehtml .= "<td>yearString</td>\n";
-$singlehtml .= "<td>kildeString</td>\n";
-$singlehtml .= "</tr>\n\n";
-
-// Søke i Bokhylla
-$rawurl = "http://www.nb.no/services/search/v2/search?q=<!QUERY!>&fq=digital%3AJa&fq=mediatype%3A(Bøker)&fq=contentClasses%3A<!MATERIAL!>&itemsPerPage=" . $makstreff . "&ft=" . $bokhyllaft;
-
-if ($_REQUEST['epub'] == "2") { // epub valgt
-	$rawurl = str_replace ("<!MATERIAL!>" , "(epub)" , $rawurl);
-$result = "epub";
-	if ($_REQUEST['pdf'] == "1") { // pdf også valgt
-		$rawurl = str_replace ("(epub)" , "(public%20OR%20epub)" , $rawurl);
-$result = "BEGGE";
-	}
-} else if ($_REQUEST['pdf'] == "1") { // bare pdf valgt
-	$rawurl = str_replace ("<!MATERIAL!>" , "(public)" , $rawurl);
-$result = "pdf";
-} else {
-	echo "<h2>Velg enten PDF eller e-bok (eller begge!)</h2>";
-	echo '<input type="button" value="Lukk vinduet" id="close" onclick="window.close()" />';
-	break;
-}
-
-
-//$rawurl = str_replace ("<!QUERY!>" , utf8_decode($search_string) , $rawurl); // sette inn søketerm
-$rawurl = str_replace ("<!QUERY!>" , $search_string , $rawurl); // sette inn søketerm
-
-// LASTE TREFFLISTE SOM XML
-
-$output = get_content($rawurl);
-$xmldata = simplexml_load_string($output);
-
-// FINNE ANTALL TREFF
-$bokhyllaantalltreff = substr(stristr($xmldata->subtitle, " of ") , 4);
-
-// ... SÅ HVERT ENKELT TREFF
-	$teller = 0;
-	foreach ($xmldata->entry as $entry) {
-		if ($teller < $makstreff) {
-
-			// METADATA SOM XML FOR DETTE TREFFET
-			$childxml = ($entry->link[0]->attributes()->href); // Dette er XML med metadata
-			
-			$output = get_content($childxml);
-			$childxmldata = simplexml_load_string($output);
-
-			$namespaces = $entry->getNameSpaces(true);
-			$nb = $entry->children($namespaces['nb']);
-	
-			$bokhyllatreff[$teller]['tittel'] = $childxmldata->titleInfo->title;
-			$bokhyllatreff[$teller]['forfatter'] = $nb->namecreator;
-	
-			// FINNE URN
-			if (stristr($nb->urn , ";")) {
-				$tempura = explode (";" , $nb->urn);
-				$urn = trim($tempura[1]); // vi tar nummer 2 
-			} else {
-				$urn = $nb->urn[0];
-			}
-	
-			$bokhyllatreff[$teller]['url'] = "http://urn.nb.no/" . $urn;
-			$bokhyllatreff[$teller]['kilde'] = "Nasjonalbiblioteket";
-		
-			// FINNE UTGIVELSESSTED OG -ÅR
-
-			if (!empty($childxmldata->originInfo->dateIssued[1])) {
-				$bokhyllatreff[$teller]['year'] = $childxmldata->originInfo->dateIssued[1];
-			} else {
-				$bokhyllatreff[$teller]['year'] = $childxmldata->originInfo->dateIssued[0];
-			}
-
-			$publishedby = $childxmldata->originInfo->publisher;
-			$publishedplace = $childxmldata->originInfo->place->placeTerm;
-			if ($publishedplace != "") {
-				$bokhyllatreff[$teller]['utgitt'] = $publishedplace;
-				if ($publishedby != "") {
-				$bokhyllatreff[$teller]['utgitt'] .= " : " . $publishedby;
-				}
-			} else {
-				$bokhyllatreff[$teller]['utgitt'] = $publishedby;
-			}
-
-			$teller++;
-		}
-	} // SLUTT PÅ HVERT ENKELT TREFF
-
-foreach ($bokhyllatreff as $singeltreff) {
-        $bokhyllatreffhtml = str_replace ("urlString" , $singeltreff['url'] , $singlehtml);
-        $bokhyllatreffhtml = str_replace ("titleString" , trunc($singeltreff['tittel'], 12) , $bokhyllatreffhtml);
-        $bokhyllatreffhtml = str_replace ("authorString" , trunc($singeltreff['forfatter'], 5) , $bokhyllatreffhtml);
-		$bokhyllatreffhtml = str_replace ("publishedString" , $singeltreff['utgitt'] , $bokhyllatreffhtml);		
-		$bokhyllatreffhtml = str_replace ("yearString" , $singeltreff['year'] , $bokhyllatreffhtml);		
-		$bokhyllatreffhtml = str_replace ("classString" , "bokhyllatreff" , $bokhyllatreffhtml);
-		$bokhyllatreffhtml = str_replace ("kildeString" , "bokhylla.no" , $bokhyllatreffhtml);
-       
-        $bokhyllahtml .= $bokhyllatreffhtml;
-}
-
-
-// Let's go bokselskap
-
-$search_string = str_replace ("%22" , "", $search_string);
-$search_string = urldecode ($search_string);
-
-//echo "<h1>*" . $search_string . "*</h1>";
-
-if ($_REQUEST['epub'] == "2") { // bokselskap bare hvis epub valgt!
-	
-	$xmldata = simplexml_load_file('includes/publiseringsliste_bokselskap_20140808.xml'); // Denne er lokal, så den funker
-
-// Gå gjennom lista for å finne treff
-	$teller = 0;
-
-	foreach ($xmldata->text->body->div->list->item as $entry) {
-		if ($teller < $makstreff) {
-			$url = $entry->ref->attributes()->target;
-			$forfatter = $entry->ref->name;
-			$tittel = $entry->ref->title;
-			if (mb_stristr($forfatter , $search_string) || mb_stristr($tittel , $search_string)) {
-				$bokselskaptreffhtml = str_replace ("urlString" , $url , $singlehtml);
-				$bokselskaptreffhtml = str_replace ("titleString" , trunc($tittel, 12) , $bokselskaptreffhtml);
-				$bokselskaptreffhtml = str_replace ("authorString" , trunc($forfatter , 5) , $bokselskaptreffhtml);
-				$bokselskaptreffhtml = str_replace ("publishedString" , "N/A" , $bokselskaptreffhtml);
-				$bokselskaptreffhtml = str_replace ("yearString" , "N/A" , $bokselskaptreffhtml);
-				$bokselskaptreffhtml = str_replace ("classString" , "bokselskaptreff" , $bokselskaptreffhtml);
-				$bokselskaptreffhtml = str_replace ("kildeString" , "bokselskap.no" , $bokselskaptreffhtml);
-				$bokselskaphtml .= $bokselskaptreffhtml;
-				$teller++;
-
-			}
-		}
-
-	} // SLUTT PÅ HVERT ITEM
-	$bokselskapantalltreff = $teller;
-
-} // SLUTT PÅ BARE HVIS EPUB VALGT
-
-
-// Søke i Openlibrary
-
-$search_string = str_replace ("%22" , "", $search_string);
-$search_string = urldecode ($search_string);
-
-$rawurl = "https://openlibrary.org/search.json?q=<!QUERY!>&has_fulltext=true";
-$rawurl = str_replace ("<!QUERY!>" , $search_string , $rawurl); // sette inn søketerm
-
-$resultsfile = get_content($rawurl);
-$allresults = json_decode($resultsfile);
-
-$results = $allresults->docs;
-
-// Hvert enkelt treff
-
-$teller = 0;
-$totalt = 0;
-
-foreach ($results as $treff) {
-	if ($treff->public_scan_b == '1') {
-		$totalt++;
-		if ($teller < $makstreff) {
-			$tittel = $treff->title;
-			if ($treff->subtitle != '') {
-				$tittel .= " : " . $treff->subtitle;
-			}
-			$forfatter = $treff->author_name[0];
-			$omslag = "https://covers.openlibrary.org/b/olid/" . $treff->cover_edition_key . "-M.jpg";
-			$kilde = "Open Library";
-			$url = "https://openlibrary.org/works/" . $treff->key;
-			$utgitt = $treff->publish_place[0] . " : " . $treff->publisher[0];
-			$utgittaar = $treff->publish_date[0];
-	
-			$openlibrarytreffhtml = str_replace ("urlString" , $url , $singlehtml);
-			$openlibrarytreffhtml = str_replace ("titleString" , trunc($tittel, 12) , $openlibrarytreffhtml);
-			$openlibrarytreffhtml = str_replace ("authorString" , trunc($forfatter, 5) , $openlibrarytreffhtml);
-			$openlibrarytreffhtml = str_replace ("publishedString" , $utgitt , $openlibrarytreffhtml);
-			$openlibrarytreffhtml = str_replace ("yearString" , $utgittaar , $openlibrarytreffhtml);
-			$openlibrarytreffhtml = str_replace ("classString" , "openlibrarytreff" , $openlibrarytreffhtml);
-			$openlibrarytreffhtml = str_replace ("kildeString" , "Open Library" , $openlibrarytreffhtml);
-
-			$openlibraryhtml .= $openlibrarytreffhtml;
-			$teller++;
-
-		}
-	}
-}
-
-$openlibraryantalltreff = $totalt;
-
-
-// FERDIG MED Å SØKE - SKRIVE UT SIDEN MED RESULTATER
-
-?>
-
 <!DOCTYPE html>
 <html lang="no">
   <head>
@@ -348,13 +114,249 @@ body {
 }
 
 </style>
+</head>
 
-  </head>
+
+<body>
+
+<?php
+
+// FINNER E-BØKER OG VISER TREFF PÅ HELE SIDEN
+
+// Declare variables
+$tittel = '';
+$forfatter = '';
+$bokhyllahtml = '';
+$bokhyllatreff = '';
+$bokselskaphtml = '';
+$openlibraryhtml = '';
+$bokhyllaantalltreff = '';
+$bokselskapantalltreff = '';
+$openlibraryantalltreff = '';
+
+// turn on for debug
+
+/*
+ini_set('display_startup_errors',1);
+ini_set('display_errors',1);
+error_reporting(-1);
+*/
+
+// INNSTILLINGER
+$bokhyllaft = 'false'; // fulltekstsøk i Bokhylla? (gir myriader av treff)
+$makstreff = 500; // her slår vi på stortromma - dette er fullpagesearch
+
+// vi trenger funksjoner
+require_once ('includes/functions.php');
+
+// Get Search
+$search_string = urlencode(stripslashes(strip_tags($_REQUEST['query'])));
+$search_string = str_replace ("\"", "%22" , $search_string);
+$search_string = str_replace (" ", "%20" , $search_string);
+
+// Define Output HTML Formatting of single item
+
+$singlehtml = "<tr>\n";
+$singlehtml .= "<td><a href=\"urlString\" target=\"_blank\">titleString</a></td>\n";
+$singlehtml .= "<td>authorString</td>\n";
+$singlehtml .= "<td>publishedString</td>\n";
+$singlehtml .= "<td>yearString</td>\n";
+$singlehtml .= "<td>kildeString</td>\n";
+$singlehtml .= "</tr>\n\n";
+
+// Søke i Bokhylla
+$rawurl = "http://www.nb.no/services/search/v2/search?q=<!QUERY!>&fq=digital%3AJa&fq=mediatype%3A(Bøker)&fq=contentClasses%3A<!MATERIAL!>&itemsPerPage=" . $makstreff . "&ft=" . $bokhyllaft;
+
+if ($_REQUEST['epub'] == "2") { // epub valgt
+	$rawurl = str_replace ("<!MATERIAL!>" , "(epub)" , $rawurl);
+$result = "epub";
+	if ($_REQUEST['pdf'] == "1") { // pdf også valgt
+		$rawurl = str_replace ("(epub)" , "(public%20OR%20epub)" , $rawurl);
+$result = "BEGGE";
+	}
+} else if ($_REQUEST['pdf'] == "1") { // bare pdf valgt
+	$rawurl = str_replace ("<!MATERIAL!>" , "(public)" , $rawurl);
+$result = "pdf";
+} else {
+	echo "<h2>Velg enten PDF eller e-bok (eller begge!)</h2>";
+	echo '<input type="button" value="Lukk vinduet" id="close" onclick="window.close()" />';
+	break;
+}
 
 
-  <body>
-<div class="loader"></div>
+//$rawurl = str_replace ("<!QUERY!>" , utf8_decode($search_string) , $rawurl); // sette inn søketerm
+$rawurl = str_replace ("<!QUERY!>" , $search_string , $rawurl); // sette inn søketerm
 
+// LASTE TREFFLISTE SOM XML
+
+$output = get_content($rawurl);
+$xmldata = simplexml_load_string($output);
+
+// FINNE ANTALL TREFF
+$bokhyllaantalltreff = substr(stristr($xmldata->subtitle, " of ") , 4);
+
+// ... SÅ HVERT ENKELT TREFF
+
+	$teller = 0;
+	foreach ($xmldata->entry as $entry) {
+		if ($teller < $makstreff) {
+
+			// METADATA SOM XML FOR DETTE TREFFET
+			$childxml = ($entry->link[0]->attributes()->href); // Dette er XML med metadata
+			
+			//$output = get_content($childxml);
+			//$childxmldata = simplexml_load_string($output);
+			$childxmldata = simplexml_load_file($childxml);
+
+			$namespaces = $entry->getNameSpaces(true);
+			$nb = $entry->children($namespaces['nb']);
+	
+			$bokhyllatreff[$teller]['tittel'] = $childxmldata->titleInfo->title;
+			$bokhyllatreff[$teller]['forfatter'] = $nb->namecreator;
+	
+			// FINNE URN
+			if (stristr($nb->urn , ";")) {
+				$tempura = explode (";" , $nb->urn);
+				$urn = trim($tempura[1]); // vi tar nummer 2 
+			} else {
+				$urn = $nb->urn[0];
+			}
+	
+			$bokhyllatreff[$teller]['url'] = "http://urn.nb.no/" . $urn;
+			$bokhyllatreff[$teller]['kilde'] = "Nasjonalbiblioteket";
+		
+			// FINNE UTGIVELSESSTED OG -ÅR
+
+			if (!empty($childxmldata->originInfo->dateIssued[1])) {
+				$bokhyllatreff[$teller]['year'] = $childxmldata->originInfo->dateIssued[1];
+			} else {
+				$bokhyllatreff[$teller]['year'] = $childxmldata->originInfo->dateIssued[0];
+			}
+
+			$publishedby = $childxmldata->originInfo->publisher;
+			$publishedplace = $childxmldata->originInfo->place->placeTerm;
+			if ($publishedplace != "") {
+				$bokhyllatreff[$teller]['utgitt'] = $publishedplace;
+				if ($publishedby != "") {
+				$bokhyllatreff[$teller]['utgitt'] .= " : " . $publishedby;
+				}
+			} else {
+				$bokhyllatreff[$teller]['utgitt'] = $publishedby;
+			}
+
+			$teller++;
+		}
+	} // SLUTT PÅ HVERT ENKELT TREFF
+
+foreach ($bokhyllatreff as $singeltreff) {
+        $bokhyllatreffhtml = str_replace ("urlString" , $singeltreff['url'] , $singlehtml);
+        $bokhyllatreffhtml = str_replace ("titleString" , trunc($singeltreff['tittel'], 12) , $bokhyllatreffhtml);
+        $bokhyllatreffhtml = str_replace ("authorString" , trunc($singeltreff['forfatter'], 5) , $bokhyllatreffhtml);
+		$bokhyllatreffhtml = str_replace ("publishedString" , $singeltreff['utgitt'] , $bokhyllatreffhtml);		
+		$bokhyllatreffhtml = str_replace ("yearString" , $singeltreff['year'] , $bokhyllatreffhtml);		
+		$bokhyllatreffhtml = str_replace ("classString" , "bokhyllatreff" , $bokhyllatreffhtml);
+		$bokhyllatreffhtml = str_replace ("kildeString" , "bokhylla.no" , $bokhyllatreffhtml);
+       
+        $bokhyllahtml .= $bokhyllatreffhtml;
+}
+
+// Let's go bokselskap
+
+$search_string = str_replace ("%22" , "", $search_string);
+$search_string = urldecode ($search_string);
+
+//echo "<h1>*" . $search_string . "*</h1>";
+
+if ($_REQUEST['epub'] == "2") { // bokselskap bare hvis epub valgt!
+	
+//	$xmldata = simplexml_load_file('includes/publiseringsliste_bokselskap_20140808.xml');
+	$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_XML_20141121.xml');
+
+// Gå gjennom lista for å finne treff
+	$teller = 0;
+
+	foreach ($xmldata->text->body->div->list->item as $entry) {
+		if ($teller < $makstreff) {
+			$url = $entry->ref->attributes()->target;
+			$forfatter = $entry->ref->name[0];
+			if (isset($entry->ref->name[1])) {
+				$utgitt = $entry->ref->name[1];
+			}
+			$tittel = $entry->ref->title;
+			$aar = $entry->ref->date;
+			if (mb_stristr($forfatter , $search_string) || mb_stristr($tittel , $search_string)) {
+				$bokselskaptreffhtml = str_replace ("urlString" , $url , $singlehtml);
+				$bokselskaptreffhtml = str_replace ("titleString" , trunc($tittel, 12) , $bokselskaptreffhtml);
+				$bokselskaptreffhtml = str_replace ("authorString" , trunc($forfatter , 5) , $bokselskaptreffhtml);
+				$bokselskaptreffhtml = str_replace ("publishedString" , $utgitt , $bokselskaptreffhtml);
+				$bokselskaptreffhtml = str_replace ("yearString" , $aar , $bokselskaptreffhtml);
+				$bokselskaptreffhtml = str_replace ("classString" , "bokselskaptreff" , $bokselskaptreffhtml);
+				$bokselskaptreffhtml = str_replace ("kildeString" , "bokselskap.no" , $bokselskaptreffhtml);
+				$bokselskaphtml .= $bokselskaptreffhtml;
+				$teller++;
+
+			}
+		}
+
+	} // SLUTT PÅ HVERT ITEM
+	$bokselskapantalltreff = $teller;
+
+} // SLUTT PÅ BARE HVIS EPUB VALGT
+
+// Søke i Openlibrary
+
+$search_string = str_replace ("%22" , "", $search_string);
+$search_string = urldecode ($search_string);
+
+$rawurl = "https://openlibrary.org/search.json?q=<!QUERY!>&has_fulltext=true";
+$rawurl = str_replace ("<!QUERY!>" , $search_string , $rawurl); // sette inn søketerm
+
+$resultsfile = get_content($rawurl);
+$allresults = json_decode($resultsfile);
+
+$results = $allresults->docs;
+
+// Hvert enkelt treff
+
+$teller = 0;
+$totalt = 0;
+
+foreach ($results as $treff) {
+	if ($treff->public_scan_b == '1') {
+		$totalt++;
+		if ($teller < $makstreff) {
+			$tittel = $treff->title;
+			if ($treff->subtitle != '') {
+				$tittel .= " : " . $treff->subtitle;
+			}
+			$forfatter = $treff->author_name[0];
+			$omslag = "https://covers.openlibrary.org/b/olid/" . $treff->cover_edition_key . "-M.jpg";
+			$kilde = "Open Library";
+			$url = "https://openlibrary.org" . $treff->key;
+			$utgitt = $treff->publish_place[0] . " : " . $treff->publisher[0];
+			$utgittaar = $treff->publish_date[0];
+	
+			$openlibrarytreffhtml = str_replace ("urlString" , $url , $singlehtml);
+			$openlibrarytreffhtml = str_replace ("titleString" , trunc($tittel, 12) , $openlibrarytreffhtml);
+			$openlibrarytreffhtml = str_replace ("authorString" , trunc($forfatter, 5) , $openlibrarytreffhtml);
+			$openlibrarytreffhtml = str_replace ("publishedString" , $utgitt , $openlibrarytreffhtml);
+			$openlibrarytreffhtml = str_replace ("yearString" , $utgittaar , $openlibrarytreffhtml);
+			$openlibrarytreffhtml = str_replace ("classString" , "openlibrarytreff" , $openlibrarytreffhtml);
+			$openlibrarytreffhtml = str_replace ("kildeString" , "Open Library" , $openlibrarytreffhtml);
+
+			$openlibraryhtml .= $openlibrarytreffhtml;
+			$teller++;
+
+		}
+	}
+}
+
+$openlibraryantalltreff = $totalt;
+
+
+// FERDIG MED Å SØKE - SKRIVE UT SIDEN MED RESULTATER
+
+?>
 	<div id="controls">
 		<div id="perpage">
 			<select onchange="sorter.size(this.value)">

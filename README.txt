@@ -1,9 +1,9 @@
 === Ebook Search by Webloft ===
 Contributors: sundaune
-Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft
+Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft, bibvenn
 Requires at least: 4.0
-Tested up to: 4.0
-Stable tag: 1.0.2
+Tested up to: 4.1
+Stable tag: 1.0.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -119,11 +119,49 @@ NORWEGIAN:
 
 == Change log ==
 
+= 1.0.4 =
+
+* Incorporated new book list from bokselskap.no - now showing publisher and year of publication
+* Some code speedup
+
+= 1.0.3 = 
+
+* Bugfix: header text not respecting specified width
+* Bugfix: Links to Open library titles were wrong (thank you, Håvard Grimelid!)
+* Various cosmetic improvements
+
+= 1.0.2 =
+
+* Improved and more readable readme.txt
+
+= 1.0.1 =
+
+* Fixed various errors
+
 = 1.0 =
 
 * First version
 
 NORWEGIAN:
+
+= 1.0.4 =
+
+* Lagt inn ny bokliste fra bokselskap.no - viser nå utgiver og utgivelsesår
+* Litt kodeoptimalisering
+
+= 1.0.3 =
+
+* Bugfix: Angitt bredde ble ikke respektert i overskriftstekst
+* Bugfix: Lenker til verker til Openlibrary var feil (takk, Håvard Grimelid!)
+* Forskjellige kosmetiske forbedringer
+
+= 1.0.2 =
+
+* Bedre og mer forståelig readme.txt
+
+= 1.0.1 =
+
+* Fikset forskjellig småtteri
 
 = 1.0 =
 
@@ -131,4 +169,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-No upgrade notice at this point
+Denne versjonen har med ny bokliste fra bokselskap.no, som også inkluderer årstall for utgivelse.
+
+NORWEGIAN:
+
+his version includes the most recent publication list from bokselskap.no, also including each work's year of publication.
