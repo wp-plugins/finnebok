@@ -12,7 +12,7 @@
  * Plugin Name:       Ebook Search by Webloft
  * Plugin URI:        http://www.bibvenn.no/finnebok
  * Description:       S&oslash;ker etter gratis PDF- og e-b&oslash;ker / search for free PDFs and e-books
- * Version:           1.0.3
+ * Version:           1.0.4
  * Author:            H&aring;kon Sundaune
  * Author URI:        http://www.sundaune.no
  * Text Domain:       finnebok-locale
@@ -84,7 +84,7 @@ $htmlout .= '<br style="clear: both;">';
 $htmlout .= '</div>';
 $htmlout .= '<h4 id="results-text" style="line-height: 1.1em; display: none; width: ' . $width . '">';
 //$htmlout .= '<img style="float: left; margin-right: 2%; margin-bottom: 5px; box-shadow: none; width: 40px;" class="webloftlogo" src="' . plugins_url( 'g/webloftlogo.png', __FILE__ ) . '" alt="Bibliotekarens beste venn / Webløft" />';
-$htmlout .= 'Viser maks. ' . $makstreff . ' treff for: <b id="finnebok_search-string"></b><br /><i>S&oslash;ket oppdateres mens du skriver, og kan ta noen sekunder... v&aelig;r t&aring;lmodig! Vil du &aring;pne s&oslash;ket i et eget vindu og eventuelt vise flere treff, klikk <input style="font-size: 1em; padding: 3px; height: 2em; font-weight: bold; vertical-align: top;" type="submit" value="her!"></form></i></h4>';
+$htmlout .= 'Viser maks. ' . $makstreff . ' treff for: <b id="finnebok_search-string"></b><br /><i>S&oslash;ket oppdateres mens du skriver, og kan ta noen sekunder... v&aelig;r t&aring;lmodig! &Aring;pne s&oslash;ket i et eget vindu ved &aring; klikke <input style="font-size: 1em; padding: 3px; height: 2em; font-weight: bold; vertical-align: top;" type="submit" value="her!"></form></i></h4>';
 $htmlout .= '<div id="finnebok_results" style="width: ' . $width . '"></div>';
 
 return $htmlout;

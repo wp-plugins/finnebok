@@ -102,12 +102,21 @@ $bokhyllaantalltreff = substr(stristr($xmldata->subtitle, " of ") , 4);
 				$urn = $nb->urn[0];
 			}
 			if ($urn != "") {
-				//$bokhyllatreff[$teller]['bokomslag'] = "http://www.nb.no/services/image/resolver?url_ver=geneza&urn=" . $urn . "_C1&maxLevel=6&level=1&col=0&row=0&resX=6000&resY=6000&tileWidth=2048&tileHeight=2048";
-				$bokhyllatreff[$teller]['bokomslag'] = "http://www.nb.no/services/iiif/api/" . $urn . "_C1/full/160,/0/native.jpg";
+				$bokhyllatreff[$teller]['bokomslag'] = 'http://www.nb.no/services/image/resolver?url_ver=geneza&urn=' . $urn . '_C1&maxLevel=5&level=1&col=0&row=0&resX=9000&resY=9000&tileWidth=1024&tileHeight=1024';
+				//$bokhyllatreff[$teller]['bokomslag'] = "http://www.nb.no/services/iiif/api/" . $urn . "_C1/full/160,/0/native.jpg";
 			} else {
 				$bokhyllatreff[$teller]['bokomslag'] = $generiskbokomslag; // DEFAULTOMSLAG
 			}
 	
+			if (!empty($childxmldata->originInfo->dateIssued[1])) {
+				$bokhyllatreff[$teller]['year'] = $childxmldata->originInfo->dateIssued[1];
+			} else {
+				$bokhyllatreff[$teller]['year'] = $childxmldata->originInfo->dateIssued[0];
+			}
+
+			if ($bokhyllatreff[$teller]['year'] != "") {
+				$bokhyllatreff[$teller]['tittel'] .= " (" . $bokhyllatreff[$teller]['year'] . ")";
+			}
 			$bokhyllatreff[$teller]['url'] = "http://urn.nb.no/" . $urn;
 			$bokhyllatreff[$teller]['kilde'] = "Nasjonalbiblioteket";
 			$teller++;
@@ -118,7 +127,7 @@ foreach ($bokhyllatreff as $singeltreff) {
 		$bokhyllatreffhtml = str_replace ("twitterurlString" , urlencode($singeltreff['url']) , $singlehtml);
 		$bokhyllatreffhtml = str_replace ("twitterdescriptionString" , htmlspecialchars($tittel). htmlspecialchars(" (".$forfatter.")"), $bokhyllatreffhtml);		
         $bokhyllatreffhtml = str_replace ("urlString" , $singeltreff['url'] , $bokhyllatreffhtml);
-        $bokhyllatreffhtml = str_replace ("titleString" , trunc($singeltreff['tittel'], 12) , $bokhyllatreffhtml);
+        $bokhyllatreffhtml = str_replace ("titleString" , trunc($singeltreff['tittel'], 15) , $bokhyllatreffhtml);
         $bokhyllatreffhtml = str_replace ("descriptionString" , trunc($singeltreff['forfatter'], 5) , $bokhyllatreffhtml);
 		$bokhyllatreffhtml = str_replace ("omslagString" , $singeltreff['bokomslag'] , $bokhyllatreffhtml);
 		$bokhyllatreffhtml = str_replace ("classString" , "bokhyllatreff" , $bokhyllatreffhtml);
@@ -134,7 +143,8 @@ $search_string = urldecode ($search_string);
 
 if (($_REQUEST['format'] == "undefined2") || ($_REQUEST['format']) == "12") { // bokselskap bare hvis epub valgt!
 	
-	$xmldata = simplexml_load_file('includes/publiseringsliste_bokselskap_20140808.xml'); // Denne er lokal, så den funker
+	//$xmldata = simplexml_load_file('includes/publiseringsliste_bokselskap_20140808.xml'); // Denne er lokal, så den funker
+	$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_XML_20141121.xml');
 
 // Gå gjennom lista for å finne treff
 	$teller = 0;
@@ -142,8 +152,15 @@ if (($_REQUEST['format'] == "undefined2") || ($_REQUEST['format']) == "12") { //
 	foreach ($xmldata->text->body->div->list->item as $entry) {
 		if ($teller < $makstreff) {
 			$url = $entry->ref->attributes()->target;
-			$forfatter = $entry->ref->name;
+			$forfatter = $entry->ref->name[0];
+			if (isset($entry->ref->name[1])) {
+				$utgitt = $entry->ref->name[1];
+			}
 			$tittel = $entry->ref->title;
+			$aar = $entry->ref->date;
+			if ($aar != "") {
+				$tittel .= " (" . $aar . ")";
+			}
 			if (mb_stristr($forfatter , $search_string) || mb_stristr($tittel , $search_string)) {
 				$bokselskaptreffhtml = str_replace ("twitterurlString" , urlencode($url) , $singlehtml);
 				$bokselskaptreffhtml = str_replace ("twitterdescriptionString" , htmlspecialchars($tittel). htmlspecialchars(" (".$forfatter.")"), $bokselskaptreffhtml); 
@@ -181,6 +198,7 @@ $teller = 0;
 $totalt = 0;
 
 foreach ($results as $treff) {
+	$aar = '';
 	if ($treff->public_scan_b == '1') {
 		$totalt++;
 		if ($teller < $makstreff) {
@@ -192,7 +210,10 @@ foreach ($results as $treff) {
 			$omslag = "https://covers.openlibrary.org/b/olid/" . $treff->cover_edition_key . "-M.jpg";
 			$kilde = "Open Library";
 			$url = "https://openlibrary.org" . $treff->key;
-	
+			$aar = $treff->first_publish_year;
+			if ($aar != "") {
+				$tittel .= " (" . $aar . ")";
+			}
 	
 			$openlibrarytreffhtml = str_replace ("twitterurlString" , urlencode($url), $singlehtml);
 			$openlibrarytreffhtml = str_replace ("twitterdescriptionString" , htmlspecialchars($tittel). htmlspecialchars(" (".$forfatter.")"), $openlibrarytreffhtml);
