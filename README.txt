@@ -3,7 +3,7 @@ Contributors: sundaune
 Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft, bibvenn
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.0.4
+Stable tag: 1.0.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -119,6 +119,12 @@ NORWEGIAN:
 
 == Change log ==
 
+= 1.0.5 =
+
+* Hitting Enter no longer opens a new window - you have to click the button
+* Removed superfluous widget code
+* New list from bokselskap.no, dated 2015-01-23
+
 = 1.0.4 =
 
 * Incorporated new book list from bokselskap.no - now showing publisher and year of publication
@@ -143,6 +149,12 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 1.0.5 =
+
+* Trykk på Enter åpner ikke lenger nytt vindu, du må klikke på knappen
+* Fjernet overflødig widget-kode
+* Ny bokliste fra bokselskap.no, dato 2015-01-23
 
 = 1.0.4 =
 
@@ -169,8 +181,8 @@ NORWEGIAN:
 
 == Upgrade Notice ==
 
-Denne versjonen har med ny bokliste fra bokselskap.no, som også inkluderer årstall for utgivelse.
+No upgrade notive at this point
 
 NORWEGIAN:
 
-his version includes the most recent publication list from bokselskap.no, also including each work's year of publication.
+Ingen beskjeder

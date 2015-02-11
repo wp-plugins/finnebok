@@ -144,7 +144,8 @@ $search_string = urldecode ($search_string);
 if (($_REQUEST['format'] == "undefined2") || ($_REQUEST['format']) == "12") { // bokselskap bare hvis epub valgt!
 	
 	//$xmldata = simplexml_load_file('includes/publiseringsliste_bokselskap_20140808.xml'); // Denne er lokal, så den funker
-	$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_XML_20141121.xml');
+	//$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_XML_20141121.xml');
+	$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_2015-01-23.xml');
 
 // Gå gjennom lista for å finne treff
 	$teller = 0;
