@@ -3,18 +3,18 @@
 /**
  *
  * @package   Ebook Search by Webloft
- * @author    Håkon Sundaune <haakon@bibliotekarensbestevenn.no>
+ * @author    H&aring;kon Sundaune / Webekspertene <haakon@webekspertene.no>
  * @license   GPL-3.0+
- * @link      http://www.bibvenn.no 
+ * @link      http://www.webekspertene.no/
  * @copyright 2014 Sundaune
  *
  * @wordpress-plugin
  * Plugin Name:       Ebook Search by Webloft
- * Plugin URI:        http://www.bibvenn.no/finnebok
+ * Plugin URI:        hhttp://www.webekspertene.no/
  * Description:       S&oslash;ker etter gratis PDF- og e-b&oslash;ker / search for free PDFs and e-books
- * Version:           1.0.4
- * Author:            H&aring;kon Sundaune
- * Author URI:        http://www.sundaune.no
+ * Version:           1.0.6
+ * Author:            H&aring;kon Sundaune / Webekspertene
+ * Author URI:        http://www.webekspertene.no/
  * Text Domain:       finnebok-locale
  * License:           GPL-3.0+
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.txt
@@ -28,13 +28,17 @@ if ( ! defined( 'WPINC' ) ) {
 }
 
 // INCLUDE NECESSARY  
-    
-    add_action( 'wp_enqueue_scripts', 'safely_add_stylesheet' );
+
+    add_action( 'wp_enqueue_scripts', 'safely_add_stylesheets_and_scripts' );
 
     /**
-     * Add stylesheet to the page
+     * Add stylesheets and scripts to the page
      */
-    function safely_add_stylesheet() {
+    function safely_add_stylesheets_and_scripts() {
+		wp_enqueue_script('finnebok-script', plugins_url( 'js/public.js', __FILE__ ), array('jquery') );
+		wp_enqueue_script('finnebok-tab-script', plugins_url( 'js/tabcontent.js', __FILE__ ), array('jquery') );
+		wp_enqueue_script('finnebok-admin-script', plugins_url( 'js/admin.js', __FILE__ ), array('jquery') );
+		wp_enqueue_style('finnebok-admin-styles', plugins_url( 'css/admin.css', __FILE__ ) );
         wp_enqueue_style( 'finnebok-shortcode-style', plugins_url('/css/public.css', __FILE__) );
     }
 
@@ -43,8 +47,7 @@ if ( ! defined( 'WPINC' ) ) {
 function finnebok_func ($atts){
 
 extract(shortcode_atts(array(
-	'width' => "250px",
-	'dummy' => "dummytekst",
+	'width' => "80%",
 	'makstreff' => "25"
    ), $atts));
 
@@ -68,7 +71,7 @@ $htmlout .= '<div class="ebok_skjema" style="width: ' . $width . '">';
 $htmlout .= '<h2 style="margin-bottom: 10px; text-align: center;">S&oslash;k i e-bok og PDF</h2>';
 $htmlout .= '<form target="_blank" method="GET" action="' . plugins_url('ebok_fullpagesearch.php' , __FILE__) . '">';
 $htmlout .= '<table style="width: 85%; border: 0; margin: 0; padding: 0;"><tr><td style="border: 0; padding: 0; margin: 0; vertical-align: middle; width: 80%;">';
-$htmlout .= '<input name="query" type="text" autocomplete="off" id="search" placeholder="S&oslash;k etter..." />';
+$htmlout .= '<input onkeypress="return handleEnter(this, event)" name="query" type="text" autocomplete="off" id="search" placeholder="S&oslash;k etter..." />';
 //$htmlout .= '</td><td style="border: 0; padding: 0; margin: 0; vertical-align: middle; width: 20%;">';
 //$htmlout .= '<input type="submit" value="" class="finnebok_submit" />';
 $htmlout .= '</td></tr></table>';
@@ -84,8 +87,9 @@ $htmlout .= '<br style="clear: both;">';
 $htmlout .= '</div>';
 $htmlout .= '<h4 id="results-text" style="line-height: 1.1em; display: none; width: ' . $width . '">';
 //$htmlout .= '<img style="float: left; margin-right: 2%; margin-bottom: 5px; box-shadow: none; width: 40px;" class="webloftlogo" src="' . plugins_url( 'g/webloftlogo.png', __FILE__ ) . '" alt="Bibliotekarens beste venn / Webløft" />';
-$htmlout .= 'Viser maks. ' . $makstreff . ' treff for: <b id="finnebok_search-string"></b><br /><i>S&oslash;ket oppdateres mens du skriver, og kan ta noen sekunder... v&aelig;r t&aring;lmodig! &Aring;pne s&oslash;ket i et eget vindu ved &aring; klikke <input style="font-size: 1em; padding: 3px; height: 2em; font-weight: bold; vertical-align: top;" type="submit" value="her!"></form></i></h4>';
-$htmlout .= '<div id="finnebok_results" style="width: ' . $width . '"></div>';
+
+$htmlout .= 'Viser maks. ' . $makstreff . ' treff for: <b id="finnebok_search-string"></b><br /><i>S&oslash;ket oppdateres mens du skriver, og kan ta noen sekunder... v&aelig;r t&aring;lmodig!<br><input style="margin: 5px 0; padding: 10px 2%; width: 96%;" type="submit" value="&Aring;pne s&oslash;ket i et eget vindu ved &aring; klikke her!"></form></i></h4>';
+$htmlout .= '<div id="finnebok_results" style="width: ' . $width . ';"></div>';
 
 return $htmlout;
 
@@ -151,11 +155,6 @@ if ( is_admin() && ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) ) {
 	//add_action( 'plugins_loaded', array( 'finnebok_admin', 'get_instance' ) );
 
 }
-
-
-
-
-
 
 // WIDGET CODE TO FOLLOW
 
@@ -354,18 +353,18 @@ class finnebok_widget extends WP_Widget {
 	/**
 	 * Registers and enqueues admin-specific styles.
 	 */
-	public function register_admin_styles() {
+	public function register_admin_styles() { // GJØRES ALLEREDE SIDEN VI IKKE HAR WIDGET
 
-		wp_enqueue_style( $this->get_widget_slug().'-admin-styles', plugins_url( 'css/admin.css', __FILE__ ) );
+	//	wp_enqueue_style( $this->get_widget_slug().'-admin-styles', plugins_url( 'css/admin.css', __FILE__ ) );
 
 	} // end register_admin_styles
 
 	/**
 	 * Registers and enqueues admin-specific JavaScript.
 	 */
-	public function register_admin_scripts() {
+	public function register_admin_scripts() { // GJØRES ALLEREDE SIDEN VI IKKE HAR WIDGET
 
-		wp_enqueue_script( $this->get_widget_slug().'-admin-script', plugins_url( 'js/admin.js', __FILE__ ), array('jquery') );
+		// wp_enqueue_script( $this->get_widget_slug().'-admin-script', plugins_url( 'js/admin.js', __FILE__ ), array('jquery') );
 
 	} // end register_admin_scripts
 
@@ -382,14 +381,15 @@ class finnebok_widget extends WP_Widget {
 	/**
 	 * Registers and enqueues widget-specific scripts.
 	 */
-	public function register_widget_scripts() {
+	public function register_widget_scripts() { // GJØRES ALLEREDE SIDEN VI IKKE HAR WIDGET
 
-		wp_enqueue_script( $this->get_widget_slug().'-script', plugins_url( 'js/public.js', __FILE__ ), array('jquery') );
-		wp_enqueue_script( $this->get_widget_slug().'-tab-script', plugins_url( 'js/tabcontent.js', __FILE__ ), array('jquery') );
+//		wp_enqueue_script( $this->get_widget_slug().'-script', plugins_url( 'js/public.js', __FILE__ ), array('jquery') );
+//		wp_enqueue_script( $this->get_widget_slug().'-tab-script', plugins_url( 'js/tabcontent.js', __FILE__ ), array('jquery') );
 
 	} // end register_widget_scripts
 
 } // end class
 
-// TODO: Remember to change 'Widget_Name' to match the class name definition
-add_action( 'widgets_init', create_function( '', 'register_widget("finnebok_widget");' ) );
+// IKKE WIDGET FORELØPIG
+
+//add_action( 'widgets_init', create_function( '', 'register_widget("finnebok_widget");' ) );
