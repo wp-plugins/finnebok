@@ -33,6 +33,9 @@ $search_string = str_replace (" ", "%20" , $search_string);
 
 // Define Output HTML Formatting of single item
 
+$gotourn_link = 'http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'];
+$gotourn_link = str_replace ("search.php" , "" , $gotourn_link);
+
 $singlehtml = '';
 $singlehtml .= "<div class=\"ebokresult classString\">\n";
 $singlehtml .= "<a class=\"ebokresultlink\" href=\"urlString\" target=\"_blank\">\n";
@@ -40,7 +43,7 @@ $singlehtml .= "<img class=\"ebokresultcover\" src=\"omslagString\" alt=\"" . ht
 $singlehtml .= "<b>titleString</b></a>\n";
 $singlehtml .= "<br /><span class=\"ebokresultdescription\">descriptionString</span><br />\n";
 $singlehtml .= '<a target="_blank" href="https://twitter.com/intent/tweet?url=twitterurlString&via=bibvenn&text=twitterdescriptionString&related=bibvenn,sundaune&lang=no"><img style="width: 20px; height: 20px;" src="' . $litentwitt . '" alt="Twitter-deling" /></a>&nbsp;';
-$singlehtml .= "<a target=\"_self\" href=\"javascript:fbShare('urlString', 700, 350)\"><img style=\"width: 50px; height: 21px;\" src=\"" . $litenface . "\" alt=\"Facebook-deling\" /></a>";
+$singlehtml .= "<a target=\"_self\" href=\"javascript:fbShare('" . $gotourn_link . "gotourn.php?params=paramsString', 700, 350)\"><img style=\"width: 50px; height: 21px;\" src=\"" . $litenface . "\" alt=\"Facebook-deling\" /></a>";
 
 $singlehtml .= "<br style=\"clear: both;\">";
 $singlehtml .= "</div>\n\n";
@@ -119,15 +122,27 @@ $bokhyllaantalltreff = substr(stristr($xmldata->subtitle, " of ") , 4);
 			}
 			$bokhyllatreff[$teller]['url'] = "http://urn.nb.no/" . $urn;
 			$bokhyllatreff[$teller]['kilde'] = "Nasjonalbiblioteket";
+
+			$bokhyllatreff[$teller]['params'] = utf8_decode($bokhyllatreff[$teller]['tittel']) . " - " . utf8_decode($bokhyllatreff[$teller]['forfatter']);
+			$bokhyllatreff[$teller]['params'] .= "|x|";
+			$bokhyllatreff[$teller]['params'] .= "Delt via E-boksøk, en Wordpress-plugin fra Webløft og Bibliotekarens Beste Venn";
+			$bokhyllatreff[$teller]['params'] .= "|x|";
+			$bokhyllatreff[$teller]['params'] .= $bokhyllatreff[$teller]['url'];
+			$bokhyllatreff[$teller]['params'] .= "|x|";
+//			$bokhyllatreff[$teller]['params'] .= str_replace ("&" , "%26" , $bokhyllatreff[$teller]['bokomslag']);
+			$bokhyllatreff[$teller]['params'] .= $bokhyllatreff[$teller]['bokomslag'];
+			$bokhyllatreff[$teller]['params'] = base64_encode(urlencode($bokhyllatreff[$teller]['params']));
+		
 			$teller++;
 		}
 	} // SLUTT PÅ HVERT ENKELT TREFF
 
 foreach ($bokhyllatreff as $singeltreff) {
 		$bokhyllatreffhtml = str_replace ("twitterurlString" , urlencode($singeltreff['url']) , $singlehtml);
-		$bokhyllatreffhtml = str_replace ("twitterdescriptionString" , htmlspecialchars($tittel). htmlspecialchars(" (".$forfatter.")"), $bokhyllatreffhtml);		
+		$bokhyllatreffhtml = str_replace ("twitterdescriptionString" , htmlspecialchars($singeltreff['tittel']). htmlspecialchars(" (".$singeltreff['forfatter'].")"), $bokhyllatreffhtml);		
         $bokhyllatreffhtml = str_replace ("urlString" , $singeltreff['url'] , $bokhyllatreffhtml);
         $bokhyllatreffhtml = str_replace ("titleString" , trunc($singeltreff['tittel'], 15) , $bokhyllatreffhtml);
+		$bokhyllatreffhtml = str_replace ("paramsString" , $singeltreff['params'] , $bokhyllatreffhtml);
         $bokhyllatreffhtml = str_replace ("descriptionString" , trunc($singeltreff['forfatter'], 5) , $bokhyllatreffhtml);
 		$bokhyllatreffhtml = str_replace ("omslagString" , $singeltreff['bokomslag'] , $bokhyllatreffhtml);
 		$bokhyllatreffhtml = str_replace ("classString" , "bokhyllatreff" , $bokhyllatreffhtml);
@@ -145,7 +160,8 @@ if (($_REQUEST['format'] == "undefined2") || ($_REQUEST['format']) == "12") { //
 	
 	//$xmldata = simplexml_load_file('includes/publiseringsliste_bokselskap_20140808.xml'); // Denne er lokal, så den funker
 	//$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_XML_20141121.xml');
-	$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_2015-01-23.xml');
+	//$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_2015-01-23.xml');
+	$xmldata = simplexml_load_file('includes/bokselskap_publiseringsliste_XML_20150415.xml');
 
 // Gå gjennom lista for å finne treff
 	$teller = 0;
@@ -168,6 +184,7 @@ if (($_REQUEST['format'] == "undefined2") || ($_REQUEST['format']) == "12") { //
 				$bokselskaptreffhtml = str_replace ("urlString" , $url , $bokselskaptreffhtml);
 				$bokselskaptreffhtml = str_replace ("titleString" , trunc($tittel, 12) , $bokselskaptreffhtml);
 				$bokselskaptreffhtml = str_replace ("descriptionString" , trunc($forfatter, 5) , $bokselskaptreffhtml);
+				$bokselskaptreffhtml = str_replace ("paramsString" , $params , $bokselskaptreffhtml);
 				$bokselskaptreffhtml = str_replace ("omslagString" , $generiskbokomslag , $bokselskaptreffhtml);
 				$bokselskaptreffhtml = str_replace ("classString" , "bokselskaptreff" , $bokselskaptreffhtml);
 				$bokselskaphtml .= $bokselskaptreffhtml;
@@ -215,13 +232,17 @@ foreach ($results as $treff) {
 			if ($aar != "") {
 				$tittel .= " (" . $aar . ")";
 			}
-	
+
+		// Fikse params, husk base64_encode
+
+				
 			$openlibrarytreffhtml = str_replace ("twitterurlString" , urlencode($url), $singlehtml);
 			$openlibrarytreffhtml = str_replace ("twitterdescriptionString" , htmlspecialchars($tittel). htmlspecialchars(" (".$forfatter.")"), $openlibrarytreffhtml);
 			$openlibrarytreffhtml = str_replace ("urlString" , $url , $openlibrarytreffhtml);
 			$openlibrarytreffhtml = str_replace ("titleString" , trunc($tittel, 12) , $openlibrarytreffhtml);
 			$openlibrarytreffhtml = str_replace ("descriptionString" , trunc($forfatter, 5) , $openlibrarytreffhtml);
 			$openlibrarytreffhtml = str_replace ("omslagString" , $omslag , $openlibrarytreffhtml);
+			$openlibrarytreffhtml = str_replace ("paramsString" , $params , $openlibrarytreffhtml);
 			$openlibrarytreffhtml = str_replace ("classString" , "openlibrarytreff" , $openlibrarytreffhtml);
 			$openlibraryhtml .= $openlibrarytreffhtml;
 			$teller++;

@@ -3,18 +3,18 @@
 /**
  *
  * @package   Ebook Search by Webloft
- * @author    Håkon Sundaune <haakon@bibliotekarensbestevenn.no>
+ * @author    H&aring;kon Sundaune / Webekspertene <haakon@webekspertene.no>
  * @license   GPL-3.0+
- * @link      http://www.bibvenn.no 
+ * @link      http://www.webekspertene.no/
  * @copyright 2014 Sundaune
  *
  * @wordpress-plugin
  * Plugin Name:       Ebook Search by Webloft
- * Plugin URI:        http://www.bibvenn.no/finnebok
+ * Plugin URI:        hhttp://www.webekspertene.no/
  * Description:       S&oslash;ker etter gratis PDF- og e-b&oslash;ker / search for free PDFs and e-books
- * Version:           1.0.5
- * Author:            H&aring;kon Sundaune
- * Author URI:        http://www.sundaune.no
+ * Version:           1.0.6
+ * Author:            H&aring;kon Sundaune / Webekspertene
+ * Author URI:        http://www.webekspertene.no/
  * Text Domain:       finnebok-locale
  * License:           GPL-3.0+
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.txt

@@ -1,9 +1,9 @@
 === Ebook Search by Webloft ===
 Contributors: sundaune
-Tags: E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft, bibvenn
+Tags: Webekspertene, E-bøker, PDF, Nasjonalbiblioteket, Bokselskap, bok, bøker, Open Library, openlibrary, Ebooks, ebook search, search, webløft, webloft, bibvenn
 Requires at least: 4.0
 Tested up to: 4.1
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -119,6 +119,10 @@ NORWEGIAN:
 
 == Change log ==
 
+= 1.0.6 =
+
+* New version of publication list from bokselskap.no dated 15th of April 2015
+
 = 1.0.5 =
 
 * Hitting Enter no longer opens a new window - you have to click the button
@@ -149,6 +153,10 @@ NORWEGIAN:
 * First version
 
 NORWEGIAN:
+
+= 1.0.6 =
+
+* Ny versjon av publiseringsliste fra bokselskap.no per 15. april 2015
 
 = 1.0.5 =
 
